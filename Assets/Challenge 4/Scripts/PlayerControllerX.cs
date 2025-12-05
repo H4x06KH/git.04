@@ -6,11 +6,13 @@ public class PlayerControllerX : MonoBehaviour
 {
     private Rigidbody playerRb;
     private float speed = 500;
+    private float turboSpeed = 1500;
     private GameObject focalPoint;
 
     public bool hasPowerup;
     public GameObject powerupIndicator;
     public int powerUpDuration = 5;
+    public GameObject smoke;
 
     private float normalStrength = 10; // how hard to hit enemy without powerup
     private float powerupStrength = 25; // how hard to hit enemy with powerup
@@ -19,12 +21,24 @@ public class PlayerControllerX : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         focalPoint = GameObject.Find("Focal Point");
+        smoke = GameObject.Find("Smoke_Particle");
     }
 
     void Update()
-    {
+    { 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+
+            smoke.GetComponent<ParticleSystem>().Play();
+
+        }
         // Add force to player in direction of the focal point (and camera)
         float verticalInput = Input.GetAxis("Vertical");
+        if (Input.GetKey(KeyCode.Space))
+        {
+            smoke.transform.position = transform.position;
+            playerRb.AddForce(focalPoint.transform.forward * verticalInput * turboSpeed * Time.deltaTime);
+        }
         playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * Time.deltaTime); 
 
         // Set powerup indicator position to beneath player
@@ -46,7 +60,7 @@ public class PlayerControllerX : MonoBehaviour
     // Coroutine to count down powerup duration
     IEnumerator PowerupCooldown()
     {
-        yield return new WaitForSeconds(powerUpDuration);
+        yield return new WaitForSeconds(5);
         hasPowerup = false;
         powerupIndicator.SetActive(false);
     }
@@ -57,8 +71,8 @@ public class PlayerControllerX : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy"))
         {
             Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
-            Vector3 awayFromPlayer =  transform.position - other.gameObject.transform.position; 
-           
+            Vector3 awayFromPlayer = other.gameObject.transform.position - transform.position;
+
             if (hasPowerup) // if have powerup hit enemy with powerup force
             {
                 enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
