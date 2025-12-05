@@ -149,5 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b4815411703b1d4ca99d44fd9549fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceIntensity: 1
+  forceIntensity: 0.1
+  minY: -10
   player: {fileID: 0}
